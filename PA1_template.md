@@ -5,19 +5,23 @@ output:
     keep_md: true
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 # Activity Monitoring Data Analysis
 
 
 ## 0. Load the necessary library
-```{r}
+
+```r
 library(utils)
 library(ggplot2)
 ```
+
+```
+## Warning: パッケージ 'ggplot2' はバージョン 4.3.2 の R の下で造られました
+```
 ## 1. Loading and preprocessing the data
-```{r}
+
+```r
 # Read the CSV file directly from the zipped archive
 zipFilePath <- "activity.zip"
 csvFileName <- "activity.csv"
@@ -28,27 +32,48 @@ totalStepsByDay <- aggregate(steps ~ date, data, sum, na.rm = TRUE)
 ```
 
 ## 2. What is mean total number of steps taken per day?
-```{r}
+
+```r
 # Make a histogram of the total number of steps taken each day
 hist(totalStepsByDay$steps, main = "Total Steps Taken Each Day", xlab = "Total Steps", ylab = "Frequency", col = "blue")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+```r
 # Calculate and report the mean and median total number of steps taken per day
 meanSteps <- mean(totalStepsByDay$steps)
 medianSteps <- median(totalStepsByDay$steps)
 
 # Print the results
 cat("Mean total number of steps taken per day: ", meanSteps, "\n")
+```
+
+```
+## Mean total number of steps taken per day:  10766.19
+```
+
+```r
 cat("Median total number of steps taken per day: ", medianSteps, "\n")
 ```
 
+```
+## Median total number of steps taken per day:  10765
+```
+
 ## 3. What is the average daily activity pattern?
-```{r}
+
+```r
 # Calculate the average number of steps taken in each 5-minute interval
 averageStepsByInterval <- aggregate(steps ~ interval, data, mean, na.rm = TRUE)
 
 # Make a time series plot
 plot(averageStepsByInterval$interval, averageStepsByInterval$steps, type = "l", xlab = "Interval", ylab = "Average Number of Steps", main = "Average Daily Activity Pattern")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
+```r
 # Identify the interval with the maximum average number of steps
 maxInterval <- averageStepsByInterval[which.max(averageStepsByInterval$steps), ]$interval
 
@@ -56,12 +81,23 @@ maxInterval <- averageStepsByInterval[which.max(averageStepsByInterval$steps), ]
 cat("The 5-minute interval with the maximum number of steps on average is:", maxInterval)
 ```
 
+```
+## The 5-minute interval with the maximum number of steps on average is: 835
+```
+
 ## 4. Imputing missing values
-```{r}
+
+```r
 # Calculate and report the total number of missing values
 totalNAs <- sum(is.na(data$steps))
 cat("Total number of missing values: ", totalNAs, "\n")
+```
 
+```
+## Total number of missing values:  2304
+```
+
+```r
 # Calculate the mean for each interval
 averageStepsByInterval <- aggregate(steps ~ interval, data, mean, na.rm = TRUE)
 
@@ -78,18 +114,34 @@ totalStepsByDayFilled <- aggregate(steps ~ date, filledData, sum)
 
 # Make a histogram
 hist(totalStepsByDayFilled$steps, main = "Total Steps Taken Each Day (Filled Data)", xlab = "Total Steps", ylab = "Frequency", col = "green")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+
+```r
 # Calculate mean and median
 meanStepsFilled <- mean(totalStepsByDayFilled$steps)
 medianStepsFilled <- median(totalStepsByDayFilled$steps)
 
 # Print the results
 cat("Mean total number of steps taken per day (Filled Data): ", meanStepsFilled, "\n")
+```
+
+```
+## Mean total number of steps taken per day (Filled Data):  10766.19
+```
+
+```r
 cat("Median total number of steps taken per day (Filled Data): ", medianStepsFilled, "\n")
 ```
 
+```
+## Median total number of steps taken per day (Filled Data):  10766.19
+```
+
 ## 5. Are there differences in activity patterns between weekdays and weekends?
-```{r}
+
+```r
 # Convert 'date' to Date type if it's not already
 filledData$date <- as.Date(filledData$date)
 
@@ -109,3 +161,5 @@ ggplot(averageStepsByDayType, aes(x = interval, y = steps, color = dayType)) +
   scale_color_manual(values = c("weekday" = "blue", "weekend" = "red")) +
   theme(legend.position = "bottom")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
