@@ -7,17 +7,32 @@ output:
 
 
 ## Loading and preprocessing the data
-
+wholetable <- read.csv("activity.csv")
+wholetable$date <- as.Date(wholetable$date, "%Y-%m-%d")
 
 
 ## What is mean total number of steps taken per day?
-
-
+stepsPerDay <- aggregate(steps ~ date, wholetable, FUN = sum)
+g <- ggplot (stepsPerDay, aes (x = steps))
+g + geom_histogram(fill = "blue", binwidth = 1000) +
+    labs(title = " Steps every day ", x = "Steps", y = "Frequency")
+stepsMean <- mean(stepsPerDay$steps, na.rm=TRUE)
+stepsMean
+## [1] 10766.19
+# Median of steps
+stepsMedian <- median(stepsPerDay$steps, na.rm=TRUE)
+stepsMedian
+## [1] 10765
 
 ## What is the average daily activity pattern?
+Intervalsteps <- aggregate(steps ~ interval, wholetable, mean)
+h <- ggplot (Intervalsteps, aes(x=interval, y=steps))
+h + geom_line()+ labs(title = "  Average Steps per Interval", x = "Interval", y = "Average Steps across All Days")
 
-
-
+maxInterval <- Intervalsteps[which.max(Intervalsteps$steps), ] 
+maxInterval
+##     interval    steps
+## 104      835 206.1698
 ## Imputing missing values
 
 
