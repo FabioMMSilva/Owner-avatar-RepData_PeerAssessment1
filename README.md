@@ -1,4 +1,9 @@
 ## Introduction
+This is my Coursera reproducable research Project - 1 submission
+In this course it was instructed to do data anlysis on the given
+data and document it in rmarkdown, but since Rmarkdown has now 
+become obsolete and is not used that much that is why i made 
+the documentation using Quarto.
 
 It is now possible to collect a large amount of data about personal
 movement using activity monitoring devices such as a
