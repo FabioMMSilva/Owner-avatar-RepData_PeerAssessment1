@@ -1,0 +1,206 @@
+---
+title: "Reproducible Research: Peer Assessment 1"
+format:html
+editor:visual
+---
+by:RAGHAV PRADHAN😝
+
+This is a coursera reproducable research project where we are given a file with the aim of doing Data analysis and recording all the code chunks along with the explanation in a document.
+
+Project overview
+
+This assignment makes use of data from a personal activity monitoring device. This device collects data at 5 minute intervals through out the day. The data consists of two months of data from an anonymous individual collected during the months of October and November, 2012 and include the number of steps taken in 5 minute intervals each day.
+
+The Data consists of Three varaibles
+
+Steps: Number of steps in a 5 min interval
+
+Date: The day the steps were recorder
+
+Interval: To Identify the five minute interval.
+
+# Let's view the data
+
+First we need to unzip the data as it is donwloaded as a zip file and then we can proceed with reading and getting familiar with the data
+
+```{r}
+data <- read.csv("activity.csv",colClasses=c("numeric","Date","numeric"))
+```
+
+Now we can check the dimension,head,tail to get the gist of the dataset
+
+```{r viewing the dat}
+str(data)
+head(data)
+tail(data)
+```
+
+# Question 1:
+
+The first task is to calculate the total steps taken per day and then making a histogram out of it, but first we need to ignore the NA's in the data
+
+```{r removing NA}
+dat <- data[!is.na(data),]
+```
+
+Now we can calculate the steps taken in 5 min-intervals during the day into total steps taken per day
+
+In short we basically have to compress the steps col from long to wide format on the basis of date.
+
+```{r compressing the step coloum}
+dat1 <- aggregate(dat$steps,list(dat$date),sum)
+colnames(dat1) <- c("date","steps per day")
+```
+
+Then we have to make a histogram which shows the total number of steps taken per day.
+
+```{r creating a hist}
+hist(dat1$`steps per day`,breaks = 20,main = "no of steps taken per day",xlab = "steps per day",col = "blue")
+```
+
+The last part of question asks us to calculate the mean and the median of the total number of steps taken from the dat1 dataset.
+
+```{r loading package,message=FALSE}
+library(dplyr)
+```
+
+For this we will be using the DPLYR package.
+
+```{r}
+finaldat1 <-  summarise(dat1 ,meanofsteps=mean(dat1$`steps per day`),medianofsteps=median(dat1$`steps per day`))
+finaldat1
+```
+
+#Question 2:
+
+We are told to make a time series plot with x axis having the 5 min interval and y axis with avg of total steps across all time intervals.
+
+So,we first calculate the average of steps taken on the basis of 5 min intervals
+
+```{r calculating the avg}
+dat2 <- aggregate(dat$steps,list(dat$interval),mean)
+colnames(dat2) <- c("interval","average steps")
+```
+
+Now plotting the time series graph where x axis is the time interval and y axis is the avg steps taken in that interval
+
+```{r plotting the graph}
+plot(x = dat2$interval,y = dat2$`average steps`, type = "l", main = "plot of avg steps in intervals",xlab = "intervals of 5-mins",ylab = "avg steps",col="darkblue")
+```
+
+In the last part of this question we are told to find the maximum no of steps taken across all the 5 min interval
+
+```{r}
+dat2[grep(max(dat2$`average steps`),dat2$`average steps`),]
+```
+
+so the maximum number of steps was taken in the inteval 835.
+
+
+# Question 3
+
+This is concerned with imputing the missing values in the main dataset(as the data contains alot of misssing values which can cause some mishaps in the calculation)
+
+So first we need to calculate the amount of missing values present in the variables.
+
+```{r}
+summarise(data,sum(is.na(data$steps)),sum(is.na(data$date)),sum(is.na(data$interval)))
+```
+
+We can see that all 2304 NA's are present in the steps variable,so in order to fill in the missing NA I have come up with plan of using the mean of the interval that we calculated in the previous question for filling the NA.
+
+```{r replacing NA with avg of interval}
+data3 <- data
+for(i in 1:17568) {
+  if(is.na(data3[i, 1])==TRUE) {
+    data3[i, 1] <- dat2[dat2$interval %in% data3[i, 3], 2]
+  } 
+}
+head(data3)
+```
+
+The missing values have been finally been replaced with the mean of interval which we had calculated in the previous dataset,with that we can now calculate the total steps taken in a day with imputed values(just like what we had did in Question1 with dat1 data but without Imputed values)
+
+```{r total no of steps}
+dat3 <- aggregate(data3$steps,list(data3$date),sum)
+colnames(dat3) <- c("date","steps per day")
+```
+
+Now we create the histogram just like question 1 but now with imputed values.
+
+
+```{r histogram with imputed data}
+hist(x=dat3$`steps per day`,xlab="no of steps taken per day",main="Histogram of total steps taken per day",breaks=20,col="red")
+```
+
+And lastly just like question 1 we also need to find the mean and the median of this data.
+
+```{r mean and median}
+finaldat3 <- summarise(dat3,meanofsteps=mean(dat3$`steps per day`),medianofsteps=median(dat3$`steps per day`))
+```
+
+
+since we had done the exact same calculation in the question 1,so we are told to check and see for ourselves that if there was any difference in the output before and after imputing the values
+
+{r}
+rbind(finaldat1,finaldat3)
+
+with this we can see there is not that much difference between the two before and after imputing values in the MEAN col as both of the output come out to 10766.19.
+
+where as the MEDIAN col has a subtle difference between the two as the data with NA's ignored has the output of 10765.00 and the imputed dataset has 10766.19 as we had used the average values of 5-minute intervals in the imputed dataset.
+
+{r}
+par(mfrow=c(1,2))
+hist(dat1$`steps per day`, breaks=20, xlab="Number of Steps Taken", col="blue",ylim = c(0,20), main=NULL)
+hist(dat3$`steps per day`,breaks=20,xlab="NUmber of steps Taken",col="red",ylim=c(0,20),main=NULL)
+
+we can see that the frequency increases in the second histogram due to the imputed values
+
+# Question 4
+
+The question asks if there is differences in activity patterns between weekdays and weekends.For this we are told to use the new dataset with imputed values.
+
+For this we first need to create a new col as a factor variable to check whether the day it was recorded was weekday or weekend.
+
+{r making factor variable}
+daydata <- data3
+#making a new coloum where it shows the day of the date
+daydata$days <- weekdays(daydata$date)
+#making another empty col where it will show whether the day is weekday/weekend
+daydata$weekday <- as.character(rep(0, times=17568))
+for (i in 1:17568) {
+  if(daydata[i,4] %in% c("Saturday","Sunday")) {
+    daydata[i,5] <- "Weekend" 
+  } else {
+    daydata[i,5] <- "Weekday"
+  }
+}
+daydata$weekday <- as.factor(daydata$weekday)
+head(daydata)
+
+Now with this we have two new colounm's where one contains the name of the day and the other which is a variable factor of weekday and weekend.
+
+In order to compare the weekend and weekday activity we first need to separate them into two new dataset which can be done with the help of factor variable easily.
+
+{r splitting weekday and weekend}
+weekday <- daydata[daydata$weekday == "Weekday",]
+weekend <- daydata[daydata$weekday == "Weekend",]
+
+Then we need to calculate the avg of total steps taken per 5 min interval just like in previous question 2
+
+{r cal avg of steps on interval basis}
+meanweekday <- aggregate(steps ~ interval,weekday,mean)
+meanweekend <- aggregate(steps ~ interval,weekend,mean)
+
+Last step is to plot a time series graph to check the difference between the average steps taken in 5 min intervals during weekday and weekend.The y-axis indicates the Avg steps taken whereas the x-axis indicates the intervals(5-min).
+
+{r}
+par(mfrow=c(2,1),mar=c(4,4.1,3,2.1))
+plot(x=meanweekday$interval,y=meanweekday$steps,xlab="interval(5min)",ylab="avg steps taken",type="l",main="TS plot of avg steps taken per interval during weekday",col="darkblue")
+plot(x=meanweekend$interval,y=meanweekend$steps,xlab="interval(5min)",ylab="avg steps taken",type="l",main="TS plot of avg steps taken per interval during weekend",col="darkred")
+
+With this we have come to the end of this project.
+
+thank you.
+
+
