@@ -5,7 +5,11 @@ data and document it in rmarkdown, but since Rmarkdown has now
 become obsolete and is not used that much that is why i made 
 the documentation using Quarto.
 
-
+This updated Files in the repo re
+* PA1_teplate.Qmd: the assignment had asked for a Rmd file but since i did the assignment in quarto it is Qmd
+* PA1_template.html: the file with html codes
+* figure: since there is no Md file in quarto so there was no default figure file so i had to put the figures into several
+files instead of one single directory
 
 It is now possible to collect a large amount of data about personal
 movement using activity monitoring devices such as a
