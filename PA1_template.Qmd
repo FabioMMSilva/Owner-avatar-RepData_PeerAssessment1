@@ -142,17 +142,19 @@ finaldat3 <- summarise(dat3,meanofsteps=mean(dat3$`steps per day`),medianofsteps
 
 since we had done the exact same calculation in the question 1,so we are told to check and see for ourselves that if there was any difference in the output before and after imputing the values
 
-{r}
+```{r}
 rbind(finaldat1,finaldat3)
+```
 
 with this we can see there is not that much difference between the two before and after imputing values in the MEAN col as both of the output come out to 10766.19.
 
 where as the MEDIAN col has a subtle difference between the two as the data with NA's ignored has the output of 10765.00 and the imputed dataset has 10766.19 as we had used the average values of 5-minute intervals in the imputed dataset.
 
-{r}
+```{r}
 par(mfrow=c(1,2))
 hist(dat1$`steps per day`, breaks=20, xlab="Number of Steps Taken", col="blue",ylim = c(0,20), main=NULL)
 hist(dat3$`steps per day`,breaks=20,xlab="NUmber of steps Taken",col="red",ylim=c(0,20),main=NULL)
+```
 
 we can see that the frequency increases in the second histogram due to the imputed values
 
@@ -162,7 +164,7 @@ The question asks if there is differences in activity patterns between weekdays 
 
 For this we first need to create a new col as a factor variable to check whether the day it was recorded was weekday or weekend.
 
-{r making factor variable}
+```{r making factor variable}
 daydata <- data3
 #making a new coloum where it shows the day of the date
 daydata$days <- weekdays(daydata$date)
@@ -177,27 +179,30 @@ for (i in 1:17568) {
 }
 daydata$weekday <- as.factor(daydata$weekday)
 head(daydata)
+```
 
 Now with this we have two new colounm's where one contains the name of the day and the other which is a variable factor of weekday and weekend.
 
 In order to compare the weekend and weekday activity we first need to separate them into two new dataset which can be done with the help of factor variable easily.
 
-{r splitting weekday and weekend}
+```{r splitting weekday and weekend}
 weekday <- daydata[daydata$weekday == "Weekday",]
 weekend <- daydata[daydata$weekday == "Weekend",]
+```
 
 Then we need to calculate the avg of total steps taken per 5 min interval just like in previous question 2
 
-{r cal avg of steps on interval basis}
+```{r cal avg of steps on interval basis}
 meanweekday <- aggregate(steps ~ interval,weekday,mean)
 meanweekend <- aggregate(steps ~ interval,weekend,mean)
-
+```
 Last step is to plot a time series graph to check the difference between the average steps taken in 5 min intervals during weekday and weekend.The y-axis indicates the Avg steps taken whereas the x-axis indicates the intervals(5-min).
 
-{r}
+```{r}
 par(mfrow=c(2,1),mar=c(4,4.1,3,2.1))
 plot(x=meanweekday$interval,y=meanweekday$steps,xlab="interval(5min)",ylab="avg steps taken",type="l",main="TS plot of avg steps taken per interval during weekday",col="darkblue")
 plot(x=meanweekend$interval,y=meanweekend$steps,xlab="interval(5min)",ylab="avg steps taken",type="l",main="TS plot of avg steps taken per interval during weekend",col="darkred")
+```
 
 With this we have come to the end of this project.
 
